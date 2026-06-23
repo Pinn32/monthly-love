@@ -1,0 +1,69 @@
+/**
+ * Post page — Server Component.
+ *
+ * Security model:
+ * - If the visitor hasn't entered the correct password, this component renders
+ *   ONLY the <PasswordForm>. The Notion content is never fetched, so the
+ *   article body is never present in the HTML or HTTP response.
+ * - If the session cookie says the slug is unlocked, the full article is
+ *   fetched from Notion and rendered.
+ *
+ * noindex/nofollow is set both via metadata (meta tag) and via next.config.ts
+ * (response header), so even authenticated pages stay out of search engines.
+ */
+
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { getPostMeta, getPostContent } from "@/lib/notion";
+import { isUnlocked } from "@/lib/auth";
+import { unlockPost } from "./actions";
+import PasswordForm from "@/components/PasswordForm";
+import Article from "@/components/Article";
+
+// ISR: re-fetch from Notion at most once per minute.
+// This also refreshes Notion-hosted image URLs before they expire (~1 hour).
+export const revalidate = 60;
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const meta = await getPostMeta(slug);
+
+  if (!meta) {
+    return {
+      title: "未找到",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    // Only expose the title — no description/excerpt to avoid leaking content
+    title: meta.title,
+    robots: { index: false, follow: false },
+  };
+}
+
+export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
+
+  // Fetch only meta first — always cheap, no content exposure
+  const meta = await getPostMeta(slug);
+  if (!meta) notFound();
+
+  const unlocked = await isUnlocked(slug);
+
+  if (!unlocked) {
+    // Render only the password gate; article content is NOT fetched here
+    return <PasswordForm title={meta.title} action={unlockPost.bind(null, slug)} />;
+  }
+
+  // Visitor has entered the correct password in a prior request
+  const content = await getPostContent(meta.id);
+
+  return (
+    <Article title={meta.title} date={meta.date} content={content} />
+  );
+}
