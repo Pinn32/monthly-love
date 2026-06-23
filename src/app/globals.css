@@ -9,6 +9,25 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── Safe-area gutters ───────────────────────────────────────────── */
+/* In @layer base so Tailwind utilities (sm:px-6 etc.) always win.
+   Duplicate declarations: the plain rem is a fallback for browsers
+   that reject env() inside max(); the second line overrides it when
+   supported. viewport-fit=cover is set in layout.tsx. */
+
+@layer base {
+  .px-safe {
+    padding-left: 1.25rem;
+    padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+    padding-right: 1.25rem;
+    padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+  }
+  .pb-safe {
+    padding-bottom: 2.5rem;
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* ── Toggle (Notion <details>/<summary>) ─────────────────────────── */
 
 /* Remove the browser's built-in disclosure triangle */

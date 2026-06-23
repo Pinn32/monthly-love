@@ -61,7 +61,7 @@ export default async function PostPage({ params }: Props) {
   }
 
   // Visitor has entered the correct password in a prior request.
-  // Fetch content and neighbour list in parallel.
+  // Fetch content and neighbor list in parallel.
   const [content, posts] = await Promise.all([
     getPostContent(meta.id),
     listPublishedPosts(),

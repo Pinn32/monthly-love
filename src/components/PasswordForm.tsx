@@ -47,7 +47,7 @@ export default function PasswordForm({
   }, [state.error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#faf8f5]">
+    <div className="min-h-dvh flex items-center justify-center px-safe bg-[#faf8f5]">
       <div className="w-full max-w-sm">
         {/* Decorative header */}
         <div className="mb-8 text-center">
@@ -60,7 +60,7 @@ export default function PasswordForm({
           <p className="mt-2 text-sm text-stone-400">{subtitle}</p>
         </div>
 
-        <form ref={formRef} action={formAction} className="space-y-4">
+        <form ref={formRef} action={formAction} className="space-y-4" suppressHydrationWarning>
           <div>
             <label htmlFor="password" className="sr-only">
               密码
@@ -70,9 +70,9 @@ export default function PasswordForm({
               id="password"
               name="password"
               type="password"
-              autoFocus
               autoComplete="current-password"
               placeholder="密码"
+              suppressHydrationWarning
               className={`
                 w-full rounded-xl border px-4 py-3 text-base text-stone-800
                 placeholder:text-stone-300 bg-white shadow-sm

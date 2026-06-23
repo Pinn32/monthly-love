@@ -73,11 +73,19 @@ const components: Components = {
   ),
 
   // ── Paragraph ────────────────────────────────────────────────────────────
-  p: ({ children }) => (
-    <p className="text-[#37352f] leading-[1.8] mt-[0.5em] mb-[1.2em] text-[1rem] indent-[2em]">
-      {children}
-    </p>
-  ),
+  p: ({ children, node }) => {
+    // <figure> (our img renderer) is a block element — it can't sit inside <p>.
+    // If the paragraph's only meaningful child is an img, skip the <p> wrapper.
+    const hasImg = node.children.some(
+      (c) => "tagName" in c && c.tagName === "img"
+    );
+    if (hasImg) return <>{children}</>;
+    return (
+      <p className="text-[#37352f] leading-[1.9] mt-[0.5em] mb-[1.2em] text-[1.0625rem] sm:text-[1rem] indent-[2em]">
+        {children}
+      </p>
+    );
+  },
 
   // ── Links ─────────────────────────────────────────────────────────────────
   a: ({ href, children }) => (
@@ -93,7 +101,7 @@ const components: Components = {
 
   // ── Blockquote (Notion quote + callout both become >) ─────────────────────
   blockquote: ({ children }) => (
-    <blockquote className="border-l-[3px] border-[#37352f]/20 pl-4 my-4 text-[#37352f]/70">
+    <blockquote className="not-italic border-l-[3px] border-rose-300 bg-rose-50/40 pl-5 pr-4 py-3 my-8 rounded-r text-[#37352f]">
       {children}
     </blockquote>
   ),
@@ -263,7 +271,7 @@ const components: Components = {
 
 export default function Article({ title, date, content, prev, next }: Props) {
   return (
-    <article className="min-h-screen bg-[#faf8f5] px-4 py-16">
+    <article className="min-h-dvh bg-[#faf8f5] px-safe sm:px-6 pt-10 sm:pt-16 pb-safe sm:pb-16">
       {/* Floating table of contents — only visible on xl+ screens */}
       <TableOfContents />
 
@@ -272,7 +280,7 @@ export default function Article({ title, date, content, prev, next }: Props) {
         <div className="mb-8">
           <Link
             href="/letters"
-            className="text-sm text-[#37352f]/40 hover:text-[#37352f]/70 transition-colors"
+            className="inline-block py-2 text-sm text-[#37352f]/40 hover:text-[#37352f]/70 transition-colors"
           >
             ← 所有信
           </Link>
@@ -281,8 +289,8 @@ export default function Article({ title, date, content, prev, next }: Props) {
         {/* Header */}
         <header className="mb-12 text-center">
           <div className="text-rose-300 text-3xl mb-4 select-none">✦</div>
-          <h1 className="font-serif text-4xl text-[#37352f] leading-tight mb-3">
-            {title}
+          <h1 className="font-serif text-3xl sm:text-4xl text-[#37352f] leading-tight mb-3">
+            <strong>{title}</strong>
           </h1>
           {date && (
             <time className="text-sm text-[#37352f]/40 tracking-wide">

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#faf8f5] px-4">
+    <main className="min-h-dvh flex items-center justify-center bg-[#faf8f5] px-safe">
       <Link
         href="/letters"
         className="group text-center cursor-pointer select-none outline-none"

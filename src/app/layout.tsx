@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Lora, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 
@@ -15,6 +15,10 @@ const notoSerifSC = Noto_Serif_SC({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: {
     default: "monthly love",
@@ -30,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className={`${lora.variable} ${notoSerifSC.variable} h-full`}>
-      <body className="min-h-full antialiased">{children}</body>
+    <html lang="zh-CN" className={`${lora.variable} ${notoSerifSC.variable} h-full`} suppressHydrationWarning>
+      <body className="min-h-full antialiased" suppressHydrationWarning>{children}</body>
     </html>
   );
 }
