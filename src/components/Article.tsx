@@ -22,6 +22,9 @@ import rehypeSlug from "rehype-slug";
 import type { Components } from "react-markdown";
 import { formatDate } from "@/lib/format";
 import TableOfContents from "@/components/TableOfContents";
+import CommentSection from "@/components/CommentSection";
+import type { Comment } from "@/lib/notion";
+import type { CommentResult } from "@/app/p/[slug]/actions";
 
 interface NavItem {
   slug: string;
@@ -36,6 +39,8 @@ interface Props {
   prev?: NavItem | null;
   /** Older letter (index position after this one). */
   next?: NavItem | null;
+  comments?: Comment[];
+  commentAction?: (_prev: CommentResult, formData: FormData) => Promise<CommentResult>;
 }
 
 // notion-to-md sets alt to the filename (e.g. "photo.jpg") or "image" when
@@ -269,9 +274,9 @@ const components: Components = {
   td: ({ children }) => <td className="px-3 py-2 text-left">{children}</td>,
 };
 
-export default function Article({ title, date, content, prev, next }: Props) {
+export default function Article({ title, date, content, prev, next, comments, commentAction }: Props) {
   return (
-    <article className="min-h-dvh bg-[#faf8f5] px-safe sm:px-6 pt-10 sm:pt-16 pb-safe sm:pb-16">
+    <article className="anim-fade min-h-dvh bg-[#faf8f5] px-safe sm:px-6 pt-10 sm:pt-16 pb-safe sm:pb-16">
       {/* Floating table of contents — only visible on xl+ screens */}
       <TableOfContents />
 
@@ -316,6 +321,11 @@ export default function Article({ title, date, content, prev, next }: Props) {
             {content}
           </ReactMarkdown>
         </div>
+
+        {/* Comments */}
+        {comments !== undefined && commentAction && (
+          <CommentSection comments={comments} action={commentAction} />
+        )}
 
         {/* Prev / Next navigation */}
         {(prev || next) && (

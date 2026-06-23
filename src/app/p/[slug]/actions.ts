@@ -2,7 +2,7 @@
 
 import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
-import { getPostMeta } from "@/lib/notion";
+import { getPostMeta, createComment } from "@/lib/notion";
 import { unlock } from "@/lib/auth";
 
 export interface UnlockResult {
@@ -47,6 +47,31 @@ export async function unlockPost(
   }
 
   await unlock(slug);
+  revalidatePath(`/p/${slug}`);
+
+  return { success: true };
+}
+
+// ─── Comments ────────────────────────────────────────────────────────────────
+
+export interface CommentResult {
+  success: boolean;
+  error?: string;
+}
+
+export async function postComment(
+  slug: string,
+  pageId: string,
+  _prev: CommentResult,
+  formData: FormData
+): Promise<CommentResult> {
+  const name = ((formData.get("name") as string | null) ?? "").trim();
+  const message = ((formData.get("message") as string | null) ?? "").trim();
+
+  if (!message) return { success: false, error: "请写点什么吧" };
+  if (message.length > 500) return { success: false, error: "留言不能超过 500 字" };
+
+  await createComment(pageId, name || "匿名", message);
   revalidatePath(`/p/${slug}`);
 
   return { success: true };

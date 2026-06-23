@@ -81,6 +81,39 @@ export async function getPostMeta(slug: string): Promise<PostMeta | null> {
   };
 }
 
+// ─── Comments ────────────────────────────────────────────────────────────────
+
+export interface Comment {
+  id: string;
+  name: string;
+  message: string;
+  createdAt: string;
+}
+
+/** List all comments on a page. Comments are stored as "name\nmessage". */
+export async function listComments(pageId: string): Promise<Comment[]> {
+  const response = await notion.comments.list({ block_id: pageId });
+  return response.results.map((c) => {
+    const text = c.rich_text.map((r) => r.plain_text).join("");
+    const nl = text.indexOf("\n");
+    if (nl === -1) return { id: c.id, name: "匿名", message: text, createdAt: c.created_time };
+    return {
+      id: c.id,
+      name: text.slice(0, nl).trim() || "匿名",
+      message: text.slice(nl + 1).trim(),
+      createdAt: c.created_time,
+    };
+  });
+}
+
+/** Append a comment to a page. Stored as "name\nmessage" in Notion's rich_text. */
+export async function createComment(pageId: string, name: string, message: string): Promise<void> {
+  await notion.comments.create({
+    parent: { page_id: pageId },
+    rich_text: [{ type: "text", text: { content: `${name}\n${message}` } }],
+  });
+}
+
 /**
  * Render a Notion page's content as a Markdown string.
  * Only called after the visitor has authenticated.

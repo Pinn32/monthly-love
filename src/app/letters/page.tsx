@@ -15,7 +15,9 @@ import { listPublishedPosts } from "@/lib/notion";
 import { isUnlocked, INDEX_KEY } from "@/lib/auth";
 import { formatDate } from "@/lib/format";
 import PasswordForm from "@/components/PasswordForm";
+import Sparkles from "@/components/Sparkles";
 import { unlockIndex } from "./actions";
+import type { CSSProperties } from "react";
 
 export const revalidate = 60;
 
@@ -39,11 +41,12 @@ export default async function LettersPage() {
   const posts = await listPublishedPosts();
 
   return (
-    <main className="min-h-dvh bg-[#faf8f5] px-safe sm:px-6 pt-10 sm:pt-16 pb-safe sm:pb-16">
-      <div className="mx-auto max-w-2xl">
+    <main className="bg-drift relative min-h-dvh overflow-hidden px-safe sm:px-6 pt-10 sm:pt-16 pb-safe sm:pb-16">
+      <Sparkles />
+      <div className="relative z-10 mx-auto max-w-2xl">
         {/* Header */}
-        <header className="mb-12 text-center">
-          <div className="text-rose-300 text-3xl mb-4 select-none">✦</div>
+        <header className="anim-rise mb-12 text-center">
+          <div className="twinkle inline-block text-rose-300 text-3xl mb-4 select-none">✦</div>
           <strong>
             <h1 className="font-serif text-3xl sm:text-4xl text-[#37352f] leading-tight">
               所有信
@@ -52,7 +55,7 @@ export default async function LettersPage() {
         </header>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-12">
+        <div className="anim-rise flex items-center gap-4 mb-12" style={{ "--anim-delay": "0.1s" } as CSSProperties}>
           <div className="flex-1 h-px bg-[#37352f]/10" />
           <span className="text-[#37352f]/20 text-xs tracking-widest">✦</span>
           <div className="flex-1 h-px bg-[#37352f]/10" />
@@ -63,11 +66,15 @@ export default async function LettersPage() {
           <p className="text-center text-[#37352f]/40 text-sm">还没有信。</p>
         ) : (
           <ol className="divide-y divide-[#37352f]/10">
-            {posts.map((post) => (
-              <li key={post.slug}>
+            {posts.map((post, i) => (
+              <li
+                key={post.slug}
+                className="anim-rise"
+                style={{ "--anim-delay": `${0.15 + i * 0.07}s` } as CSSProperties}
+              >
                 <Link
                   href={`/p/${post.slug}`}
-                  className="group block py-6 hover:bg-[#37352f]/[0.02] -mx-3 px-3 rounded-[3px] transition-colors"
+                  className="group block py-6 hover:bg-[#37352f]/[0.02] -mx-3 px-3 rounded-[3px] transition-all duration-200 hover:translate-x-1"
                 >
                   <div className="flex items-baseline justify-between gap-4 mb-1">
                     <span className="font-serif text-lg text-[#37352f] leading-snug group-hover:text-[#37352f]/80 transition-colors">

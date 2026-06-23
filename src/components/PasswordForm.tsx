@@ -3,6 +3,7 @@
 import { useActionState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { UnlockResult } from "@/app/p/[slug]/actions";
+import Sparkles from "@/components/Sparkles";
 
 interface Props {
   title: string;
@@ -47,11 +48,12 @@ export default function PasswordForm({
   }, [state.error]);
 
   return (
-    <div className="min-h-dvh flex items-center justify-center px-safe bg-[#faf8f5]">
-      <div className="w-full max-w-sm">
+    <div className="bg-drift relative min-h-dvh overflow-hidden flex items-center justify-center px-safe">
+      <Sparkles />
+      <div className="anim-rise relative z-10 w-full max-w-sm">
         {/* Decorative header */}
         <div className="mb-8 text-center">
-          <div className="inline-block mb-4 text-rose-300 text-4xl select-none">
+          <div className="twinkle inline-block mb-4 text-rose-300 text-4xl select-none">
             ✦
           </div>
           <h1 className="font-serif text-2xl text-stone-800 leading-snug">
