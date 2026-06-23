@@ -44,9 +44,11 @@ export default async function LettersPage() {
         {/* Header */}
         <header className="mb-12 text-center">
           <div className="text-rose-300 text-3xl mb-4 select-none">✦</div>
-          <h1 className="font-serif text-3xl sm:text-4xl text-[#37352f] leading-tight">
-            所有信
-          </h1>
+          <strong>
+            <h1 className="font-serif text-3xl sm:text-4xl text-[#37352f] leading-tight">
+              所有信
+            </h1>
+          </strong>
         </header>
 
         {/* Divider */}

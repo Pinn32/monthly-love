@@ -50,7 +50,7 @@ const components: Components = {
   h1: ({ children, id }) => (
     <h1
       id={id}
-      className="font-serif text-[1.875rem] font-bold text-[#37352f] mt-10 mb-1 leading-snug scroll-mt-24"
+      className="font-serif text-[1.875rem] font-bold text-[#37352f] mt-10 mb-[1.2rem] leading-snug scroll-mt-24"
     >
       {children}
     </h1>
@@ -58,7 +58,7 @@ const components: Components = {
   h2: ({ children, id }) => (
     <h2
       id={id}
-      className="font-serif text-[1.5rem] font-bold text-[#37352f] mt-9 mb-1 leading-snug scroll-mt-24"
+      className="font-serif text-[1.5rem] font-bold text-[#37352f] mt-9 mb-[1.2rem] leading-snug scroll-mt-24"
     >
       {children}
     </h2>
@@ -66,7 +66,7 @@ const components: Components = {
   h3: ({ children, id }) => (
     <h3
       id={id}
-      className="font-serif text-[1.25rem] font-semibold text-[#37352f] mt-7 mb-1 scroll-mt-24"
+      className="font-serif text-[1.25rem] font-semibold text-[#37352f] mt-7 mb-[1.2rem] scroll-mt-24"
     >
       {children}
     </h3>
@@ -76,12 +76,12 @@ const components: Components = {
   p: ({ children, node }) => {
     // <figure> (our img renderer) is a block element — it can't sit inside <p>.
     // If the paragraph's only meaningful child is an img, skip the <p> wrapper.
-    const hasImg = node.children.some(
+    const hasImg = node?.children.some(
       (c) => "tagName" in c && c.tagName === "img"
     );
     if (hasImg) return <>{children}</>;
     return (
-      <p className="text-[#37352f] leading-[1.9] mt-[0.5em] mb-[1.2em] text-[1.0625rem] sm:text-[1rem] indent-[2em]">
+      <p className="text-[#37352f] leading-[1.9] mt-[0.5em] mb-[1.2em] text-[1.35rem] sm:text-[1rem] indent-[2em]">
         {children}
       </p>
     );
