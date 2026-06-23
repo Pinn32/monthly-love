@@ -20,6 +20,7 @@ export default function PasswordForm({
 }: Props) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [state, formAction, pending] = useActionState(
     async (_prev: UnlockResult, formData: FormData) => {
@@ -59,7 +60,7 @@ export default function PasswordForm({
           <p className="mt-2 text-sm text-stone-400">{subtitle}</p>
         </div>
 
-        <form action={formAction} className="space-y-4">
+        <form ref={formRef} action={formAction} className="space-y-4">
           <div>
             <label htmlFor="password" className="sr-only">
               密码
@@ -91,6 +92,15 @@ export default function PasswordForm({
           <button
             type="submit"
             disabled={pending}
+            onTouchEnd={(e) => {
+              // On mobile, the first tap on the button dismisses the keyboard
+              // (input blur) and the synthesized click event never fires.
+              // Submitting on touchend bypasses that entirely.
+              if (!pending) {
+                e.preventDefault();
+                formRef.current?.requestSubmit();
+              }
+            }}
             className="
               w-full rounded-xl bg-stone-800 text-white py-3 text-sm
               font-medium tracking-wide transition

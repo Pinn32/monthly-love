@@ -1,11 +1,11 @@
 /**
  * Home page — intentionally minimal.
  *
- * Visitors arrive here via a direct link shared by the author.
- * The page does NOT list articles to avoid exposing even their titles publicly.
- * Change this if you want a curated index (e.g. show titles but gate body).
+ * The whole splash is a link to /letters (the password-gated index).
+ * Titles are not listed here to avoid exposing them publicly.
  */
 
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,15 +17,20 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#faf8f5] px-4">
-      <div className="text-center">
-        <div className="text-rose-300 text-5xl mb-6 select-none">✦</div>
-        <h1 className="font-serif text-3xl text-stone-700 tracking-wide mb-3">
+      <Link
+        href="/letters"
+        className="group text-center cursor-pointer select-none outline-none"
+      >
+        <div className="text-rose-300 text-5xl mb-6 select-none group-hover:text-rose-400 transition-colors">
+          ✦
+        </div>
+        <h1 className="font-serif text-3xl text-stone-700 tracking-wide mb-3 group-hover:text-stone-900 transition-colors">
           Monthly Love
         </h1>
-        <p className="text-stone-400 text-sm">
+        <p className="text-stone-400 text-sm group-hover:text-stone-500 transition-colors">
           如果你在这里，说明你收到了链接。
         </p>
-      </div>
+      </Link>
     </main>
   );
 }

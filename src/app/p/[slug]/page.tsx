@@ -14,7 +14,7 @@
 
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPostMeta, getPostContent } from "@/lib/notion";
+import { getPostMeta, getPostContent, listPublishedPosts } from "@/lib/notion";
 import { isUnlocked } from "@/lib/auth";
 import { unlockPost } from "./actions";
 import PasswordForm from "@/components/PasswordForm";
@@ -60,10 +60,24 @@ export default async function PostPage({ params }: Props) {
     return <PasswordForm title={meta.title} action={unlockPost.bind(null, slug)} />;
   }
 
-  // Visitor has entered the correct password in a prior request
-  const content = await getPostContent(meta.id);
+  // Visitor has entered the correct password in a prior request.
+  // Fetch content and neighbour list in parallel.
+  const [content, posts] = await Promise.all([
+    getPostContent(meta.id),
+    listPublishedPosts(),
+  ]);
+
+  const idx = posts.findIndex((p) => p.slug === slug);
+  const prev = idx > 0 ? posts[idx - 1] : null;
+  const next = idx >= 0 && idx < posts.length - 1 ? posts[idx + 1] : null;
 
   return (
-    <Article title={meta.title} date={meta.date} content={content} />
+    <Article
+      title={meta.title}
+      date={meta.date}
+      content={content}
+      prev={prev}
+      next={next}
+    />
   );
 }

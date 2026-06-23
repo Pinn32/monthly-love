@@ -14,16 +14,28 @@
  *   table         → GFM table
  */
 
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
 import type { Components } from "react-markdown";
 import { formatDate } from "@/lib/format";
+import TableOfContents from "@/components/TableOfContents";
+
+interface NavItem {
+  slug: string;
+  title: string;
+}
 
 interface Props {
   title: string;
   date: string | null;
   content: string;
+  /** Newer letter (index position before this one). */
+  prev?: NavItem | null;
+  /** Older letter (index position after this one). */
+  next?: NavItem | null;
 }
 
 // notion-to-md sets alt to the filename (e.g. "photo.jpg") or "image" when
@@ -33,25 +45,36 @@ const isRealCaption = (alt: string | undefined): alt is string =>
 
 const components: Components = {
   // ── Headings ─────────────────────────────────────────────────────────────
-  h1: ({ children }) => (
-    <h1 className="font-serif text-[1.875rem] font-bold text-[#37352f] mt-10 mb-1 leading-snug">
+  // rehype-slug adds `id` to each heading; pass it through for anchor links
+  // and TOC scroll-spy. scroll-mt offsets the sticky-ish back-link area.
+  h1: ({ children, id }) => (
+    <h1
+      id={id}
+      className="font-serif text-[1.875rem] font-bold text-[#37352f] mt-10 mb-1 leading-snug scroll-mt-24"
+    >
       {children}
     </h1>
   ),
-  h2: ({ children }) => (
-    <h2 className="font-serif text-[1.5rem] font-bold text-[#37352f] mt-9 mb-1 leading-snug">
+  h2: ({ children, id }) => (
+    <h2
+      id={id}
+      className="font-serif text-[1.5rem] font-bold text-[#37352f] mt-9 mb-1 leading-snug scroll-mt-24"
+    >
       {children}
     </h2>
   ),
-  h3: ({ children }) => (
-    <h3 className="font-serif text-[1.25rem] font-semibold text-[#37352f] mt-7 mb-1">
+  h3: ({ children, id }) => (
+    <h3
+      id={id}
+      className="font-serif text-[1.25rem] font-semibold text-[#37352f] mt-7 mb-1 scroll-mt-24"
+    >
       {children}
     </h3>
   ),
 
   // ── Paragraph ────────────────────────────────────────────────────────────
   p: ({ children }) => (
-    <p className="text-[#37352f] leading-[1.8] my-[0.5em] text-[1rem]">
+    <p className="text-[#37352f] leading-[1.8] mt-[0.5em] mb-[1.2em] text-[1rem] indent-[2em]">
       {children}
     </p>
   ),
@@ -182,9 +205,6 @@ const components: Components = {
   ),
 
   // ── Images ────────────────────────────────────────────────────────────────
-  // notion-to-md sets alt = Notion caption text (highest priority),
-  // filename from URL, or "image" as last resort.
-  // Only render a <figcaption> for real caption text.
   img: ({ src, alt }) => {
     const caption = isRealCaption(alt) ? alt : null;
     return (
@@ -241,10 +261,23 @@ const components: Components = {
   td: ({ children }) => <td className="px-3 py-2 text-left">{children}</td>,
 };
 
-export default function Article({ title, date, content }: Props) {
+export default function Article({ title, date, content, prev, next }: Props) {
   return (
     <article className="min-h-screen bg-[#faf8f5] px-4 py-16">
+      {/* Floating table of contents — only visible on xl+ screens */}
+      <TableOfContents />
+
       <div className="mx-auto max-w-2xl">
+        {/* Back link */}
+        <div className="mb-8">
+          <Link
+            href="/letters"
+            className="text-sm text-[#37352f]/40 hover:text-[#37352f]/70 transition-colors"
+          >
+            ← 所有信
+          </Link>
+        </div>
+
         {/* Header */}
         <header className="mb-12 text-center">
           <div className="text-rose-300 text-3xl mb-4 select-none">✦</div>
@@ -266,15 +299,51 @@ export default function Article({ title, date, content }: Props) {
         </div>
 
         {/* Body */}
-        <div>
+        <div className="article-body">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
+            rehypePlugins={[rehypeRaw, rehypeSlug]}
             components={components}
           >
             {content}
           </ReactMarkdown>
         </div>
+
+        {/* Prev / Next navigation */}
+        {(prev || next) && (
+          <nav className="mt-16 pt-8 border-t border-[#37352f]/10 grid grid-cols-2 gap-4">
+            <div>
+              {prev && (
+                <Link
+                  href={`/p/${prev.slug}`}
+                  className="group flex flex-col gap-1"
+                >
+                  <span className="text-xs text-[#37352f]/35 group-hover:text-[#37352f]/55 transition-colors">
+                    ← 上一篇
+                  </span>
+                  <span className="font-serif text-sm text-[#37352f]/60 group-hover:text-[#37352f]/80 transition-colors leading-snug line-clamp-2">
+                    {prev.title}
+                  </span>
+                </Link>
+              )}
+            </div>
+            <div className="text-right">
+              {next && (
+                <Link
+                  href={`/p/${next.slug}`}
+                  className="group flex flex-col gap-1 items-end"
+                >
+                  <span className="text-xs text-[#37352f]/35 group-hover:text-[#37352f]/55 transition-colors">
+                    下一篇 →
+                  </span>
+                  <span className="font-serif text-sm text-[#37352f]/60 group-hover:text-[#37352f]/80 transition-colors leading-snug line-clamp-2">
+                    {next.title}
+                  </span>
+                </Link>
+              )}
+            </div>
+          </nav>
+        )}
 
         {/* Footer */}
         <footer className="mt-16 text-center text-[#37352f]/20 text-xs tracking-widest">

@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { Lora } from "next/font/google";
+import { Lora, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 
-// Lora is a warm serif that suits personal writing.
-// Change to any Google Font — update variable name below too.
 const lora = Lora({
   variable: "--font-serif",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Noto Serif SC covers Chinese glyphs and harmonises with Lora's warm serif tone.
+const notoSerifSC = Noto_Serif_SC({
+  variable: "--font-serif-cjk",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -25,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className={`${lora.variable} h-full`}>
+    <html lang="zh-CN" className={`${lora.variable} ${notoSerifSC.variable} h-full`}>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-serif: var(--font-serif);
+  --font-serif: var(--font-serif), var(--font-serif-cjk), Georgia, "Times New Roman", serif;
 }
 
 html {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif), var(--font-serif-cjk), Georgia, "Times New Roman", serif;
   scroll-behavior: smooth;
 }
 
