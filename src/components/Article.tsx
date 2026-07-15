@@ -25,6 +25,7 @@ import TableOfContents from "@/components/TableOfContents";
 import CommentSection from "@/components/CommentSection";
 import type { Comment } from "@/lib/notion";
 import type { CommentResult } from "@/app/p/[slug]/actions";
+import type { Dict } from "@/lib/i18n";
 
 interface NavItem {
   slug: string;
@@ -41,6 +42,7 @@ interface Props {
   next?: NavItem | null;
   comments?: Comment[];
   commentAction?: (_prev: CommentResult, formData: FormData) => Promise<CommentResult>;
+  dict: Dict;
 }
 
 // notion-to-md sets alt to the filename (e.g. "photo.jpg") or "image" when
@@ -274,11 +276,11 @@ const components: Components = {
   td: ({ children }) => <td className="px-3 py-2 text-left">{children}</td>,
 };
 
-export default function Article({ title, date, content, prev, next, comments, commentAction }: Props) {
+export default function Article({ title, date, content, prev, next, comments, commentAction, dict }: Props) {
   return (
     <article className="anim-fade min-h-dvh bg-[#faf8f5] px-safe sm:px-6 pt-10 sm:pt-16 pb-safe sm:pb-16">
       {/* Floating table of contents — only visible on xl+ screens */}
-      <TableOfContents />
+      <TableOfContents label={dict.toc} />
 
       <div className="mx-auto max-w-2xl">
         {/* Back link */}
@@ -287,7 +289,7 @@ export default function Article({ title, date, content, prev, next, comments, co
             href="/letters"
             className="inline-block py-2 text-sm text-[#37352f]/40 hover:text-[#37352f]/70 transition-colors"
           >
-            ← 所有信
+            {dict.post.back}
           </Link>
         </div>
 
@@ -324,7 +326,7 @@ export default function Article({ title, date, content, prev, next, comments, co
 
         {/* Comments */}
         {comments !== undefined && commentAction && (
-          <CommentSection comments={comments} action={commentAction} />
+          <CommentSection comments={comments} action={commentAction} labels={dict.comments} />
         )}
 
         {/* Prev / Next navigation */}
@@ -337,7 +339,7 @@ export default function Article({ title, date, content, prev, next, comments, co
                   className="group flex flex-col gap-1"
                 >
                   <span className="text-xs text-[#37352f]/35 group-hover:text-[#37352f]/55 transition-colors">
-                    ← 上一篇
+                    {dict.post.prev}
                   </span>
                   <span className="font-serif text-sm text-[#37352f]/60 group-hover:text-[#37352f]/80 transition-colors leading-snug line-clamp-2">
                     {prev.title}
@@ -352,7 +354,7 @@ export default function Article({ title, date, content, prev, next, comments, co
                   className="group flex flex-col gap-1 items-end"
                 >
                   <span className="text-xs text-[#37352f]/35 group-hover:text-[#37352f]/55 transition-colors">
-                    下一篇 →
+                    {dict.post.next}
                   </span>
                   <span className="font-serif text-sm text-[#37352f]/60 group-hover:text-[#37352f]/80 transition-colors leading-snug line-clamp-2">
                     {next.title}

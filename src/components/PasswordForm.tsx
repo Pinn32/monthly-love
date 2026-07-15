@@ -4,10 +4,13 @@ import { useActionState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { UnlockResult } from "@/app/p/[slug]/actions";
 import Sparkles from "@/components/Sparkles";
+import type { Dict } from "@/lib/i18n";
 
 interface Props {
   title: string;
-  subtitle?: string;
+  subtitle: string;
+  /** Localized form strings (label, placeholder, button states). */
+  labels: Dict["password"];
   /** A bound server action that receives the plaintext attempt and returns an UnlockResult. */
   action: (attempt: string) => Promise<UnlockResult>;
 }
@@ -16,7 +19,8 @@ const initialState: UnlockResult = { success: false };
 
 export default function PasswordForm({
   title,
-  subtitle = "输入密码后即可阅读",
+  subtitle,
+  labels,
   action,
 }: Props) {
   const router = useRouter();
@@ -57,7 +61,7 @@ export default function PasswordForm({
             ✦
           </div>
           <h1 className="font-serif text-2xl text-stone-800 leading-snug">
-            {title || "这篇文章受密码保护"}
+            {title || labels.fallbackTitle}
           </h1>
           <p className="mt-2 text-sm text-stone-400">{subtitle}</p>
         </div>
@@ -65,7 +69,7 @@ export default function PasswordForm({
         <form ref={formRef} action={formAction} className="space-y-4" suppressHydrationWarning>
           <div>
             <label htmlFor="password" className="sr-only">
-              密码
+              {labels.label}
             </label>
             <input
               ref={inputRef}
@@ -73,7 +77,7 @@ export default function PasswordForm({
               name="password"
               type="password"
               autoComplete="current-password"
-              placeholder="密码"
+              placeholder={labels.placeholder}
               suppressHydrationWarning
               className={`
                 w-full rounded-xl border px-4 py-3 text-base text-stone-800
@@ -110,7 +114,7 @@ export default function PasswordForm({
               disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
-            {pending ? "验证中…" : "进入"}
+            {pending ? labels.pending : labels.submit}
           </button>
         </form>
       </div>

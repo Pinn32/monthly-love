@@ -17,21 +17,29 @@ import { formatDate } from "@/lib/format";
 import PasswordForm from "@/components/PasswordForm";
 import Sparkles from "@/components/Sparkles";
 import { unlockIndex } from "./actions";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 import type { CSSProperties } from "react";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "所有信",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const dict = getDict(await getLocale());
+  return {
+    title: dict.letters.title,
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function LettersPage() {
+  const dict = getDict(await getLocale());
+
   if (!(await isUnlocked(INDEX_KEY))) {
     return (
       <PasswordForm
-        title="所有信"
-        subtitle="输入密码后即可查看全部信件"
+        title={dict.letters.title}
+        subtitle={dict.letters.subtitle}
+        labels={dict.password}
         action={unlockIndex}
       />
     );
@@ -49,7 +57,7 @@ export default async function LettersPage() {
           <div className="twinkle inline-block text-rose-300 text-3xl mb-4 select-none">✦</div>
           <strong>
             <h1 className="font-serif text-3xl sm:text-4xl text-[#37352f] leading-tight">
-              所有信
+              {dict.letters.title}
             </h1>
           </strong>
         </header>
@@ -63,7 +71,7 @@ export default async function LettersPage() {
 
         {/* List */}
         {posts.length === 0 ? (
-          <p className="text-center text-[#37352f]/40 text-sm">还没有信。</p>
+          <p className="text-center text-[#37352f]/40 text-sm">{dict.letters.empty}</p>
         ) : (
           <ol className="divide-y divide-[#37352f]/10">
             {posts.map((post, i) => (

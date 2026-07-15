@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Lora, Noto_Serif_SC } from "next/font/google";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
+import LangSwitch from "@/components/LangSwitch";
 import "./globals.css";
 
 const lora = Lora({
@@ -28,14 +31,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const dict = getDict(await getLocale());
+
   return (
-    <html lang="zh-CN" className={`${lora.variable} ${notoSerifSC.variable} h-full`} suppressHydrationWarning>
-      <body className="min-h-full antialiased" suppressHydrationWarning>{children}</body>
+    <html lang={dict.htmlLang} className={`${lora.variable} ${notoSerifSC.variable} h-full`} suppressHydrationWarning>
+      <body className="min-h-full antialiased" suppressHydrationWarning>
+        <LangSwitch target={dict.switchTo} label={dict.switchLabel} />
+        {children}
+      </body>
     </html>
   );
 }

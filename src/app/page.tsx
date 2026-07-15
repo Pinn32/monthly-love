@@ -8,6 +8,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Sparkles from "@/components/Sparkles";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 
 export const metadata: Metadata = {
   title: "Monthly Love",
@@ -15,7 +17,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function Home() {
+export default async function Home() {
+  const dict = getDict(await getLocale());
+
   return (
     <main className="bg-drift relative min-h-dvh overflow-hidden flex items-center justify-center px-safe">
       <Sparkles />
@@ -31,7 +35,7 @@ export default function Home() {
           Monthly Love
         </h1>
         <p className="text-stone-400 text-sm group-hover:text-stone-500 transition-colors">
-          Hi，你收到一封新的信件。
+          {dict.home.greeting}
         </p>
       </Link>
     </main>

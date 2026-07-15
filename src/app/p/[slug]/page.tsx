@@ -19,6 +19,8 @@ import { isUnlocked } from "@/lib/auth";
 import { unlockPost, postComment } from "./actions";
 import PasswordForm from "@/components/PasswordForm";
 import Article from "@/components/Article";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 
 // ISR: re-fetch from Notion at most once per minute.
 // This also refreshes Notion-hosted image URLs before they expire (~1 hour).
@@ -33,8 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const meta = await getPostMeta(slug);
 
   if (!meta) {
+    const dict = getDict(await getLocale());
     return {
-      title: "未找到",
+      title: dict.post.notFound,
       robots: { index: false, follow: false },
     };
   }
@@ -53,11 +56,19 @@ export default async function PostPage({ params }: Props) {
   const meta = await getPostMeta(slug);
   if (!meta) notFound();
 
+  const dict = getDict(await getLocale());
   const unlocked = await isUnlocked(slug);
 
   if (!unlocked) {
     // Render only the password gate; article content is NOT fetched here
-    return <PasswordForm title={meta.title} action={unlockPost.bind(null, slug)} />;
+    return (
+      <PasswordForm
+        title={meta.title || dict.password.fallbackTitle}
+        subtitle={dict.password.subtitle}
+        labels={dict.password}
+        action={unlockPost.bind(null, slug)}
+      />
+    );
   }
 
   // Visitor has entered the correct password in a prior request.
@@ -83,6 +94,7 @@ export default async function PostPage({ params }: Props) {
       next={next}
       comments={comments}
       commentAction={commentAction}
+      dict={dict}
     />
   );
 }

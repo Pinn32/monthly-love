@@ -8,7 +8,7 @@ interface Heading {
   level: number; // 1 | 2 | 3
 }
 
-export default function TableOfContents() {
+export default function TableOfContents({ label }: { label: string }) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -61,7 +61,7 @@ export default function TableOfContents() {
 
   return (
     <nav
-      aria-label="目录"
+      aria-label={label}
       className={[
         // Only visible on xl+ screens; positioned in the right gutter.
         "hidden xl:block",
@@ -72,7 +72,7 @@ export default function TableOfContents() {
       ].join(" ")}
     >
       <p className="mb-3 text-[0.65rem] font-serif tracking-widest text-[#37352f]/30 uppercase select-none">
-        目录
+        {label}
       </p>
       <ul className="space-y-0.5">
         {headings.map((h) => {

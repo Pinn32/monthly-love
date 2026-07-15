@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { CommentResult } from "@/app/p/[slug]/actions";
+import type { Dict } from "@/lib/i18n";
 
 interface Comment {
   id: string;
@@ -14,13 +15,14 @@ interface Comment {
 interface Props {
   comments: Comment[];
   action: (_prev: CommentResult, formData: FormData) => Promise<CommentResult>;
+  labels: Dict["comments"];
 }
 
 function formatCommentDate(iso: string): string {
   return iso.slice(0, 10);
 }
 
-export default function CommentSection({ comments, action }: Props) {
+export default function CommentSection({ comments, action, labels }: Props) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, pending] = useActionState(action, { success: false });
@@ -35,11 +37,11 @@ export default function CommentSection({ comments, action }: Props) {
   return (
     <section className="mt-16 pt-8 border-t border-[#37352f]/10">
       <h2 className="font-serif text-lg text-[#37352f]/60 mb-8 text-center tracking-widest">
-        留言
+        {labels.heading}
       </h2>
 
       {comments.length === 0 && (
-        <p className="text-center text-sm text-[#37352f]/30 mb-8">还没有留言，来说点什么吧</p>
+        <p className="text-center text-sm text-[#37352f]/30 mb-8">{labels.empty}</p>
       )}
 
       {comments.length > 0 && (
@@ -47,11 +49,11 @@ export default function CommentSection({ comments, action }: Props) {
           {comments.map((c) => (
             <li key={c.id} className="flex gap-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-rose-100 text-rose-400 flex items-center justify-center text-sm font-serif select-none">
-                {c.name.slice(0, 1)}
+                {(c.name || labels.anonymous).slice(0, 1)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-sm font-medium text-[#37352f]/70">{c.name}</span>
+                  <span className="text-sm font-medium text-[#37352f]/70">{c.name || labels.anonymous}</span>
                   <span className="text-xs text-[#37352f]/30">{formatCommentDate(c.createdAt)}</span>
                 </div>
                 <p className="text-sm text-[#37352f]/80 leading-relaxed whitespace-pre-wrap break-words">
@@ -67,13 +69,13 @@ export default function CommentSection({ comments, action }: Props) {
         <input
           type="text"
           name="name"
-          placeholder="你的名字（选填）"
+          placeholder={labels.namePlaceholder}
           maxLength={50}
           className="w-full px-3 py-2 text-sm bg-transparent border border-[#37352f]/15 rounded-[3px] text-[#37352f] placeholder-[#37352f]/30 focus:outline-none focus:border-rose-300 transition-colors"
         />
         <textarea
           name="message"
-          placeholder="留下你的话……"
+          placeholder={labels.messagePlaceholder}
           required
           rows={3}
           maxLength={500}
@@ -83,7 +85,7 @@ export default function CommentSection({ comments, action }: Props) {
           <p className="text-xs text-rose-400">{state.error}</p>
         )}
         {state.success && (
-          <p className="text-xs text-[#37352f]/40">留言已发送 ✦</p>
+          <p className="text-xs text-[#37352f]/40">{labels.sent}</p>
         )}
         <div className="flex justify-end">
           <button
@@ -91,7 +93,7 @@ export default function CommentSection({ comments, action }: Props) {
             disabled={pending}
             className="px-4 py-1.5 text-sm text-[#37352f]/60 border border-[#37352f]/15 rounded-[3px] hover:border-rose-300 hover:text-rose-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {pending ? "发送中…" : "发送"}
+            {pending ? labels.sending : labels.send}
           </button>
         </div>
       </form>

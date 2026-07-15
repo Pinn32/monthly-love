@@ -90,16 +90,17 @@ export interface Comment {
   createdAt: string;
 }
 
-/** List all comments on a page. Comments are stored as "name\nmessage". */
+/** List all comments on a page. Comments are stored as "name\nmessage".
+ *  `name` may be empty — the UI substitutes a localized "Anonymous" label. */
 export async function listComments(pageId: string): Promise<Comment[]> {
   const response = await notion.comments.list({ block_id: pageId });
   return response.results.map((c) => {
     const text = c.rich_text.map((r) => r.plain_text).join("");
     const nl = text.indexOf("\n");
-    if (nl === -1) return { id: c.id, name: "匿名", message: text, createdAt: c.created_time };
+    if (nl === -1) return { id: c.id, name: "", message: text, createdAt: c.created_time };
     return {
       id: c.id,
-      name: text.slice(0, nl).trim() || "匿名",
+      name: text.slice(0, nl).trim(),
       message: text.slice(nl + 1).trim(),
       createdAt: c.created_time,
     };

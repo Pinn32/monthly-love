@@ -3,6 +3,8 @@
 import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { unlock, INDEX_KEY } from "@/lib/auth";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 import type { UnlockResult } from "@/app/p/[slug]/actions";
 
 /**
@@ -14,8 +16,10 @@ import type { UnlockResult } from "@/app/p/[slug]/actions";
  * list stays locked until the variable is configured.
  */
 export async function unlockIndex(attempt: string): Promise<UnlockResult> {
+  const dict = getDict(await getLocale());
+
   if (!attempt) {
-    return { success: false, error: "请输入密码" };
+    return { success: false, error: dict.password.required };
   }
 
   const expected = Buffer.from(process.env.INDEX_PASSWORD ?? "", "utf8");
@@ -27,7 +31,7 @@ export async function unlockIndex(attempt: string): Promise<UnlockResult> {
     timingSafeEqual(expected, provided);
 
   if (!correct) {
-    return { success: false, error: "密码不正确" };
+    return { success: false, error: dict.password.wrong };
   }
 
   await unlock(INDEX_KEY);

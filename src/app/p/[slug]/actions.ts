@@ -4,6 +4,8 @@ import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { getPostMeta, createComment } from "@/lib/notion";
 import { unlock } from "@/lib/auth";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 
 export interface UnlockResult {
   success: boolean;
@@ -23,15 +25,17 @@ export async function unlockPost(
   slug: string,
   attempt: string
 ): Promise<UnlockResult> {
+  const dict = getDict(await getLocale());
+
   if (!attempt) {
-    return { success: false, error: "请输入密码" };
+    return { success: false, error: dict.password.required };
   }
 
   const meta = await getPostMeta(slug);
 
   if (!meta) {
     // Post not found or not published — don't distinguish to avoid enumeration.
-    return { success: false, error: "密码不正确" };
+    return { success: false, error: dict.password.wrong };
   }
 
   // Timing-safe comparison
@@ -43,7 +47,7 @@ export async function unlockPost(
     timingSafeEqual(expected, provided);
 
   if (!correct) {
-    return { success: false, error: "密码不正确" };
+    return { success: false, error: dict.password.wrong };
   }
 
   await unlock(slug);
@@ -65,13 +69,14 @@ export async function postComment(
   _prev: CommentResult,
   formData: FormData
 ): Promise<CommentResult> {
+  const dict = getDict(await getLocale());
   const name = ((formData.get("name") as string | null) ?? "").trim();
   const message = ((formData.get("message") as string | null) ?? "").trim();
 
-  if (!message) return { success: false, error: "请写点什么吧" };
-  if (message.length > 500) return { success: false, error: "留言不能超过 500 字" };
+  if (!message) return { success: false, error: dict.comments.writeSomething };
+  if (message.length > 500) return { success: false, error: dict.comments.tooLong };
 
-  await createComment(pageId, name || "匿名", message);
+  await createComment(pageId, name || dict.comments.anonymous, message);
   revalidatePath(`/p/${slug}`);
 
   return { success: true };
