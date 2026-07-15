@@ -67,6 +67,8 @@ export default async function PostPage({ params }: Props) {
         subtitle={dict.password.subtitle}
         labels={dict.password}
         action={unlockPost.bind(null, slug)}
+        backHref="/letters"
+        backLabel={dict.post.back}
       />
     );
   }

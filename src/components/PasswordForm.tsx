@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { UnlockResult } from "@/app/p/[slug]/actions";
 import Sparkles from "@/components/Sparkles";
 import type { Dict } from "@/lib/i18n";
@@ -13,6 +14,9 @@ interface Props {
   labels: Dict["password"];
   /** A bound server action that receives the plaintext attempt and returns an UnlockResult. */
   action: (attempt: string) => Promise<UnlockResult>;
+  /** Optional escape hatch shown under the form, e.g. back to /letters. */
+  backHref?: string;
+  backLabel?: string;
 }
 
 const initialState: UnlockResult = { success: false };
@@ -22,6 +26,8 @@ export default function PasswordForm({
   subtitle,
   labels,
   action,
+  backHref,
+  backLabel,
 }: Props) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +123,17 @@ export default function PasswordForm({
             {pending ? labels.pending : labels.submit}
           </button>
         </form>
+
+        {backHref && backLabel && (
+          <div className="mt-6 text-center">
+            <Link
+              href={backHref}
+              className="inline-block py-1 text-sm text-stone-400 hover:text-stone-600 transition-colors"
+            >
+              {backLabel}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
